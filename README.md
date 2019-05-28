@@ -1,4 +1,39 @@
-# Kaggle Data Visualization: 
+## Kaggle Data Munging:
+### [Pandas](https://www.kaggle.com/learn/pandas)
+- A **DataFrame** is a table. It contains an array of individual entries, each of which has a certain value. Each entry corresponds with a *row* (or record) and a *column*.
+- The dictionary-list constructor assigns values to the column labels, but just uses an ascending count from *0 (0, 1, 2, 3, ...)* for the *row labels*. Sometimes this is OK, but oftentimes we will want to assign these labels ourselves. The list of row labels used in a DataFrame is known as an **Index**. We can assign values to it by using an `index` parameter in our constructor: 
+  ```python
+  pd.DataFrame({"Bob": ["I liked it.", "It was awful."], "Sue": ["Pretty good.", "Bland."]}, index=["Product A", "Product B"])
+  ```
+- A **Series**, by contrast, is a sequence of data values. If a DataFrame is a table, a Series is a list. And in fact you can create one with nothing more than a list. A Series is, in essence, a single column of a DataFrame. So you can assign *row labels* to the Series the same way as before, using an `index` parameter. However, a Series do not have a column name, it only has one overall `name`.
+- Reading data:
+  ```python
+  # Read from a CSV file
+  data_csv = pd.read_csv(filepath, index_col=0)
+  
+  # Read from an Excel file
+  data_excel = pd.read_excel(filepath, sheet_name="...")
+  
+  # Read from a SQL database
+  # Kaggle only supports SQLite
+  import sqlite3
+  conn = sqlite3.connect("file_name.sqlite")
+  data_sql = pd.read_sql_query("SELECT * from table_name", conn)
+  ```
+- Writing data:
+  ```python
+  # Write a CSV file
+  data_csv.to_csv("file_name.csv")
+  
+  # Write an Excel file
+  data_excel("file_name.xlsx", sheet_name="sheet_name")
+  
+  # Output to a SQL database
+  conn = sqlite3.connect("file_name.sqlite")
+  data_sql.to_sql("table_name", conn)
+  ```
+
+## Kaggle Data Visualization: 
 ### [From Non-Coder to Coder Micro-Course](https://www.kaggle.com/learn/data-visualization-from-non-coder-to-coder)
 - **Trends** - A trend is defined as a pattern of change.
   - `sns.lineplot` - **Line charts** are best to show trends over a period of time, and multiple lines can be used to show trends in more than one group.
