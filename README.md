@@ -1,9 +1,11 @@
-## Kaggle Data Munging:
-### [Pandas](https://www.kaggle.com/learn/pandas)
+# Kaggle Data Munging:
+## [Pandas](https://www.kaggle.com/learn/pandas)
+### Creating, Reading and Writing
 - A **DataFrame** is a table. It contains an array of individual entries, each of which has a certain value. Each entry corresponds with a *row* (or record) and a *column*.
 - The dictionary-list constructor assigns values to the column labels, but just uses an ascending count from *0 (0, 1, 2, 3, ...)* for the *row labels*. Sometimes this is OK, but oftentimes we will want to assign these labels ourselves. The list of row labels used in a DataFrame is known as an **Index**. We can assign values to it by using an `index` parameter in our constructor: 
   ```python
   pd.DataFrame({"Bob": ["I liked it.", "It was awful."], "Sue": ["Pretty good.", "Bland."]}, index=["Product A", "Product B"])
+  pd.DataFrame([["I liked it.", "Pretty good."], ["It was awful.", "Bland."]], columns=["Bob", "Sue"], index=["Product A", "Product B"])
   ```
 - A **Series**, by contrast, is a sequence of data values. If a DataFrame is a table, a Series is a list. And in fact you can create one with nothing more than a list. A Series is, in essence, a single column of a DataFrame. So you can assign *row labels* to the Series the same way as before, using an `index` parameter. However, a Series do not have a column name, it only has one overall `name`.
 - Reading data:
@@ -31,6 +33,41 @@
   # Output to a SQL database
   conn = sqlite3.connect("file_name.sqlite")
   data_sql.to_sql("table_name", conn)
+  ```
+
+### Indexing, Selecting and Assigning
+- To obtain a specific entry (corresponding to column `column` and row `i`) in a DataFrame table, we can call `table.column.iloc[i]`. Remember that Python indexing starts at `0`.
+- To obtain a specific row of a DataFrame, we can use the `iloc` operator. 
+- Select the records with index labels `1`, `2`, `3`, `5`, and `8`, assigning the result to the variable `sample_data`.
+  ```python
+  indices = [1, 2, 3, 5, 8]
+  sample_data = df.loc[indices]
+  sample_data = df.iloc[indices]
+  ```
+- Create a variable `df` containing the `country`, `province`, `region_1`, and `region_2` columns of the records with the index labels `0`, `1`, `10`, and `100`. `iloc` uses the Python stdlib indexing scheme, where the first element of the range is included and the last one excluded. So `0:10` will select entries `0,...,9`. `loc`, meanwhile, indexes inclusively. So `0:10` will select entries `0,...,10`
+  ```python
+  cols = ['country', 'province', 'region_1', 'region_2']
+  indices = [0, 1, 10, 100]
+  df = reviews.loc[indices, cols]
+  ```
+- Create a variable `df` containing the `country` and `variety` columns of the first 100 records.
+  ```python
+  indices = range(100)
+  df = reviews.loc[indices, ["country", "variety"]]
+  
+  cols = ['country', 'variety']
+  df = reviews.loc[:99, cols]
+  
+  cols_idx = [0, 11]
+  df = reviews.iloc[:100, cols_idx]
+  ```
+- Create a DataFrame `italian_wines` containing reviews of wines made in `Italy`.
+  ```python
+  italian_wines = reviews[reviews["country"] == "Italy"]
+  ```
+- Create a DataFrame `top_oceania_wines` containing all reviews with at least 95 points (out of 100) for wines from Australia or New Zealand.
+  ```python
+  top_oceania_wines = reviews.loc[(reviews.country.isin(["Australia", "New Zealand"])) & (reviews.points >= 95)]
   ```
 
 ## Kaggle Data Visualization: 
