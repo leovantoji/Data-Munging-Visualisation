@@ -310,6 +310,7 @@
   ```
 
 ### Plotting with `seaborn`
+- [`seaborn` Example Gallery](https://seaborn.pydata.org/examples/index.html)
 - `seaborn` is a standalone data visualization package that provides many extremely valuable data visualizations in a single package. It is generally a much more powerful tool than pandas.
 - The `pandas` bar chart becomes a `seaborn` `countplot`.
   ```python
