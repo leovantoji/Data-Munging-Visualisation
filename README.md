@@ -217,6 +217,34 @@
   left.join(right, lsuffix='_CAN', rsuffix='_UK')
   ```
 
+### [Additional Stuffs](https://www.kaggle.com/sohier/tutorial-accessing-data-with-pandas/)
+- It's a good practice to clean column names. By convention, the names should be converted to lower case. `pandas` is case sensitive, so future calls to all of the columns will need to be updated.
+  ```python
+  df.columns = [col.replace(" ", "_").lower() for col in df.columns]
+  ```
+- Select a subset of the data. Logical operators: `~` replaces `not`, `|` replaces `or`, and `&` replaces `and`. Multiple arguments should be wrapped in parentheses.
+  ```python
+  df[df.state == "UT"] # 1 condition
+  df[(df.latitude > 50) | (df.acres > 10**6)].head() # Multiple conditions
+  df[df.park_name.str.split().apply(lambda x: len(x)==3)].head() # Complicated expressions
+  ```
+- Key companion methods: `isin` and `isnull`. These methods make it much easier and faster to perform some very common tasks. Suppose we wanted to find all parks on the West coast. `isin` makes that simple.
+  ```python
+  df[df.state.isin(["WA", "OR", "CA"])].head()
+  ```
+- Less common methods: `pandas` offers many more indexing methods. You should probably stick to a few of them for the sake of keeping your code readable, but it's worth knowing they exist in case you need to read other people's code or have an unusual use case.
+  - There are other ways to slice data with brackets. For the sake of readability, please don't use of them.
+  - `.at` and `.iat`: like `.loc` and `.iloc` but much faster in exchange for only working on a single column and only returning a single result.
+  - `.eval`: fast evaluation of a limited set of simple operators. `.query` works by calling this.
+  - `.ix`: deprecated method that tried to determine if an index should be evaluated with `.loc` or `.iloc`. This led to a lot of subtle bugs! If you see this, you're looking at old code that won't work any more.
+  - `.get`: like `.loc`, but will return a default value if the key doesn't exist in the index. Only works on a single column/series.
+  - `.lookup`: Not recommended. It's in the documentation, but it's unclear if this is actually still supported.
+  - `.mask`: like boolean indexing, but returns a dataframe/series of the same size as the original and anywhere that the boolean evaluates to `True` is set to `nan`.
+  - `.query`: similar to boolean indexing. Faster for large dataframes. Only supports a restricted set of operations; don't use if you need `isnull()` or other dataframe methods.
+  - `.take`: equivalent to `.iloc`, but can operate on either rows or columns.
+  - `.where`: like boolean indexing, but returns a dataframe/series of the same size as the original and anywhere that the boolean evaluates to `False` is set to `nan`.
+  - [Multi-indexing](http://pandas.pydata.org/pandas-docs/stable/user_guide/advanced.html): potentially useful for small to mid sized heirarchical datasets. Slow on larger datasets.
+
 # Data Visualization: 
 ## [Kaggle: From Non-Coder to Coder Micro-Course](https://www.kaggle.com/learn/data-visualization-from-non-coder-to-coder)
 - **Trends** - A trend is defined as a pattern of change.
