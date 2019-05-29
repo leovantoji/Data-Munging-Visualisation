@@ -1,5 +1,7 @@
-# Kaggle Data Munging:
-## [Pandas](https://www.kaggle.com/learn/pandas)
+# Data Munging
+## [Translate SQL query to Pandas](https://medium.com/jbennetcodes/how-to-rewrite-your-sql-queries-in-pandas-and-more-149d341fc53e)
+
+## [Kaggle: Pandas](https://www.kaggle.com/learn/pandas)
 ### Creating, Reading and Writing
 - A **DataFrame** is a table. It contains an array of individual entries, each of which has a certain value. Each entry corresponds with a *row* (or record) and a *column*.
 - The dictionary-list constructor assigns values to the column labels, but just uses an ascending count from *0 (0, 1, 2, 3, ...)* for the *row labels*. Sometimes this is OK, but oftentimes we will want to assign these labels ourselves. The list of row labels used in a DataFrame is known as an **Index**. We can assign values to it by using an `index` parameter in our constructor: 
@@ -148,8 +150,75 @@
   country_variety_counts = reviews.groupby(["country", "variety"]).size().sort_values(ascending=False)
   ```
 
-# Kaggle Data Visualization: 
-## [From Non-Coder to Coder Micro-Course](https://www.kaggle.com/learn/data-visualization-from-non-coder-to-coder)
+### Data Types and Missing Data
+- The data type for a column in a `DataFrame` or a `Series` is known as the `dtype`. `dtype` property can be used to grab the type of a specific column.
+  ```python
+  reviews.price.dtype
+  ```
+- The `dtypes` property returns the `dtype` of every column in the dataset.
+  ```python
+  reviews.dtypes
+  ```
+- Note that there isn't a `dtype` specific for strings; they instead have the `object` type. It's possible to convert a column type with the `astype` function. For example, we may transform the points column from its existing `int64` data type into a `float64` data type.
+  ```python
+  reviews.points.astype("float64")
+  ```
+- A `DataFrame` or `Series` index has its own `dtype`.
+  ```python
+  reviews.index.dtype
+  ```
+- Missing values are shown as `NaN`, short for "Not a Number". These `NaN` values are always of the `float64` dtype. `pandas` provides some methods specific to missing data. To select `NaN` entreis you can use `pd.isnull` (or its companion `pd.notnull`).
+  ```python
+  reviews[reviews.country.isnull()]
+  ```
+- Sometimes the price column is `null`. How many reviews in the dataset are missing a price?
+  ```python
+  missing_price_reviews = reviews[reviews.price.isnull()]
+  n_missing_prices = len(missing_price_reviews)
+  # Cute alternative solution: if we sum a boolean series, True is treated as 1 and False as 0
+  n_missing_prices = reviews.price.isnull().sum()
+  # or equivalently:
+  n_missing_prices = pd.isnull(reviews.price).sum()
+  ```
+- Replacing missing values is a common operation.  `pandas` provides a really handy method for this problem: `fillna`. `fillna` provides a few different strategies for mitigating such data. For example, we can simply replace each `NaN` with an `"Unknown"`. `fillna` supports a few strategies for imputing missing values.
+  ```python
+  reviews.region_2.fillna("Unknown")
+  ```
+- The `replace` method is worth mentioning here because it's handy for replacing missing data which is given some kind of sentinel value in the dataset: things like `"Unknown"`, `"Undisclosed"`, `"Invalid"`, and so on.
+  ```python
+  reviews.taster_twitter_handle.replace("@kerinokeefe", "@kerino")
+  ```
+
+### Renaming and Combining
+- Data can come with crazy column names or conventions. You'll use `pandas` renaming utility functions to change the names of the offending entries to something better. You can do this with the `rename` method. For example, you can change the `points` column to `score` like this.
+  ```python
+  reviews.rename(columns={"points": "score"})
+  ```
+- `rename` lets you rename index or column values by specifying a `index` or `column` keyword parameter, respectively. Python dict appears to be the most convenient one.
+  ```python
+  reviews.rename(index=dict(0: "first", 1: "second"))
+  ```
+- Renaming columns is very common, but renaming index values is very rarely. `set_index` is usually more convenient. Both the row index and the column index can have their own `name` attribute. The complimentary `rename_axis` method may be used to change these names.
+  ```python
+  reviews.rename_axis("wines", axis='rows').rename_axis("fields", axis='columns')
+  ```
+- When performing operations on a dataset we will sometimes need to combine different `DataFrame` and/or `Series` in non-trivial ways. There are **three core methods** for doing this. In order of increasing complexity, these are `concat`, `join`, and `merge`.'
+- The simplest combining method is `concat`. Given a list of elements, it will smashes those elements together along an axis.
+  ```python
+  canadian_youtube = pd.read_csv("../input/youtube-new/CAvideos.csv")
+  british_youtube = pd.read_csv("../input/youtube-new/GBvideos.csv")
+  pd.concat([canadian_youtube, british_youtube])
+  ```
+- The `join` function combines DataFrame objects with a common index. For example, to pull down videos that happened to be trending on the same day in both Canada and the UK, you would write. The `lsuffix` and `rsuffix` parameters are necessary here because the data has the same column names in both British and Canadian datasets. If this wasn't true (because, say, we'd renamed them beforehand) we wouldn't need them.
+  ```python
+  left = canadian_youtube.set_index(['title', 'trending_date'])
+  right = british_youtube.set_index(['title', 'trending_date'])
+
+  left.join(right, lsuffix='_CAN', rsuffix='_UK')
+  ```
+
+# Data Visualization: 
+## [Kaggle: From Non-Coder to Coder Micro-Course](https://www.kaggle.com/learn/data-visualization-from-non-coder-to-coder)
 - **Trends** - A trend is defined as a pattern of change.
   - `sns.lineplot` - **Line charts** are best to show trends over a period of time, and multiple lines can be used to show trends in more than one group.
 - **Relationship** - There are many different chart types that you can use to understand relationships between variables in your data.
