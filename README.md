@@ -1,7 +1,7 @@
 # Data Munging
 ## [Translate SQL query to Pandas](https://medium.com/jbennetcodes/how-to-rewrite-your-sql-queries-in-pandas-and-more-149d341fc53e)
 
-## [Kaggle: Pandas](https://www.kaggle.com/learn/pandas)
+## [Kaggle Microcourse: Pandas](https://www.kaggle.com/learn/pandas)
 ### Creating, Reading and Writing
 - A **DataFrame** is a table. It contains an array of individual entries, each of which has a certain value. Each entry corresponds with a *row* (or record) and a *column*.
 - The dictionary-list constructor assigns values to the column labels, but just uses an ascending count from *0 (0, 1, 2, 3, ...)* for the *row labels*. Sometimes this is OK, but oftentimes we will want to assign these labels ourselves. The list of row labels used in a DataFrame is known as an **Index**. We can assign values to it by using an `index` parameter in our constructor: 
@@ -246,7 +246,7 @@
   - [Multi-indexing](http://pandas.pydata.org/pandas-docs/stable/user_guide/advanced.html): potentially useful for small to mid sized heirarchical datasets. Slow on larger datasets.
 
 # Data Visualization: 
-## [Kaggle: From Non-Coder to Coder Micro-Course](https://www.kaggle.com/learn/data-visualization-from-non-coder-to-coder)
+## [Kaggle Microcourse: From Non-Coder to Coder Micro-Course](https://www.kaggle.com/learn/data-visualization-from-non-coder-to-coder)
 - **Trends** - A trend is defined as a pattern of change.
   - `sns.lineplot` - **Line charts** are best to show trends over a period of time, and multiple lines can be used to show trends in more than one group.
 - **Relationship** - There are many different chart types that you can use to understand relationships between variables in your data.
@@ -261,3 +261,51 @@
   - `sns.distplot` - **Histograms** show the distribution of a single numerical variable.
   - `sns.kdeplot` - **KDE plots (Kernel Density Estimation)** (or **2D KDE plots**) show an estimated, smooth distribution of a single numerical variable (or two numerical variables).
   - `sns.jointplot` - This command is useful for simultaneously displaying a 2D KDE plot with the corresponding KDE plots for each individual variable.
+
+## [Kaggle Microcourse: Data Visualisation](https://www.kaggle.com/learn/data-visualization)
+### Univariate plotting with `pandas`
+- Basic chart types:
+  ```python
+  df.plot.bar() # Bar Chart
+  df.plot.line() # Line Chart
+  df.plot.area() # Area Chart
+  df.plot.hist() # Histogram
+  df.plot.pie() # Pie Chart
+  ```
+- Wine-producing provinces of the world (category) to the number of labels of wines they produce (number).
+  ```python
+  reviews.province.value_counts().head(10).plot.bar() # Top 10 wine-producing provinces (absolute numbers)
+  (reviews.province.value_counts().head(10) / len(reviews)).plot.bar() # Top 10 wine-produing provinces (%)
+  (reviews.province.value_counts().head(10) / len(reviews)).plot.pie() # Top 10 wine-produing provinces (%)
+  ```
+- The number of reviews of a certain score allotted by Wine Magazine.
+  ```python
+  reviews.points.value_counts().sort_index().plot.bar()
+  reviews.points.value_counts().sort_index().plot.line()
+  reviews.points.value_counts().sort_index().plot.area()
+  ```
+
+### Bivariate plotting with `pandas`
+- **Scatter plot** and **Hex plot**: Good for interval and some nominal categorical data.
+- **Stacked bar chart**: Good for nominal and ordinal categorical data.
+- **Bivariate line chart**: Good for ordinal categorical and interval data.
+  ```python
+  df.plot.scatter() # Scatter plot
+  df.plot.hexbin() # Hex plot
+  df.plot.bar(stacked=True) # Stacked bar chart
+  df.plot.line() # Bivariate line chart
+  ```
+- A simple scatter plot simply maps each variable of interest to a point in two-dimensional space. Note that in order to make effective use of this plot, we had to **downsample** our data, taking just 100 points from the full set. This is because naive scatter plots do not effectively treat points which map to the same place. For example, if two wines, both costing 100 dollars, get a rating of 90, then the second one is overplotted onto the first one, and we add just one point to the plot.
+  ```python
+  reviews[reviews.price < 100].sample(100).plot.scatter(x="price", y="points")
+  reviews[reviews.price < 100].plot.scatter(x="price", y="points") # shapeless blob
+  ```
+- Due to its weakness to overplotting, scatter plot works best with relatively small datasets, and with variables which have a large number of unique values.
+- Ways to deal with overplotting.
+  - Sampling the points.
+  - Hexplot.
+- A **hex plot** aggregates points in space into hexagons, and then colors those hexagons based on the values within them.
+  ```python
+  reviews[reviews["price"] < 100].plot.hexbin(x="price", y="points", gridsize=15)
+  ```
+- 
