@@ -308,4 +308,36 @@
   ```python
   reviews[reviews["price"] < 100].plot.hexbin(x="price", y="points", gridsize=15)
   ```
-- 
+
+### Plotting with `seaborn`
+- `seaborn` is a standalone data visualization package that provides many extremely valuable data visualizations in a single package. It is generally a much more powerful tool than pandas.
+- The `pandas` bar chart becomes a `seaborn` `countplot`.
+  ```python
+  sns.countplot(reviews.points)
+  ```
+- **KDE**, short for "kernel density estimate", is a statistical technique for smoothing out data noise. It addresses an important fundamental weakness of a line chart: it will buff out outlier or "in-betweener" values which would cause a line chart to suddenly dip.
+- KDE plots can also be used in 2 dimensions.
+  ```python
+  sns.kdeplot(reviews[reviews.price < 200].loc[:, ["price", "points"]].dropna().sample(5000))
+  ```
+- Bivariate KDE plots like this one are a great alternative to scatter plots and hex plots. They solve the same data overplotting issue that scatter plots suffer from and hex plots address, in a different but similarly visually appealing. However, note that bivariate KDE plots are very computationally intensive.
+- The `seaborn` equivalent to a `pandas` histogram is the `distplot`.
+  ```python
+  sns.distplot(reviews['points'], bins=10, kde=False)
+  ```
+- To plot two variables against one another in `seaborn`, we use `jointplot`.
+  ```python
+  sns.jointplot(x="price", y="points", data=reviews[reviews.price < 100]) # Scatter plot
+  sns.jointplot(x="price", y="points", data=reviews[reviews.price < 100], kind="hex", gridsize = 20) # Hex plot
+  ```
+- `seaborn` provides a `boxplot` and `violinplot` function. The center of the distributions shown above is the "box" in boxplot. The top of the box is the 75th percentile, while the bottom is the 25th percentile. The other part of the plot, the "whiskers", shows the extent of the points beyond the center of the distribution. Individual circles beyond that are outliers.
+  ```python
+  df = reviews[reviews.variety.isin(reviews.variety.value_counts().head().index)]
+  sns.boxplot(x="variety", y="points", data=df)
+  ```
+- Boxplots are great for summarizing the shape of many datasets. They also don't have a limit in terms of numeracy: you can place as many boxes in the plot as you feel comfortable squeezing onto the page. Nonetheless, they only work for interval and nominal variables with a large number of possible values; they assume your data is roughly normally distributed (otherwise, their design doesn't make much sense); and they don't carry any information about individual values, only treating the distribution as a whole.
+  ```python
+  df = reviews[reviews.variety.isin(reviews.variety.value_counts().head().index)]
+  sns.violinplot(x="variety", y="points", data=df)
+  ```
+- A `violinplot` cleverly replaces the box in the boxplot with a kernel density estimate for the data. It shows basically the same data, but is harder to misinterpret and much prettier than the utilitarian boxplot.
