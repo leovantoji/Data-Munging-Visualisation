@@ -309,6 +309,47 @@
   reviews[reviews["price"] < 100].plot.hexbin(x="price", y="points", gridsize=15)
   ```
 
+### Styling your plots
+- Under the hood, `pandas` data visualization tools are built on top of another, lower-level graphics library called `matplotlib`. Anything that you build in `pandas` can be built using `matplotlib` directly. `pandas` merely make it easier to get that work done. `matplotlib` *does* provide a way of adjusting the title size. Let's go ahead and do it that way, and see what's different.
+  ```python
+  fig = reviews.points.value_counts().sort_index().plot.bar(
+    figsize=(12, 6), # Change figure size
+    color='mediumvioletred', # Change color
+    fontsize=16 # Change font size
+  )
+  fig.set_title("Rankings Given by Wine Magazine", fontsize=20) # Add chart title
+  sns.despine(bottom=True, left=True) # Remove chart borders
+  ```
+
+### Subplotting
+- Subplotting is a technique for creating multiple plots that live side-by-side in one overall figure. We can use the `subplots` method to create a figure with multiple subplots. `subplots` takes two arguments. The first one controls the number of *rows*, the second one the number of *columns*.
+  ```python
+  import matplotlib.pyplot as plt
+  fig, axarr = plt.subplots(2, 1, figsize=(12, 8))
+  ```
+- When `pandas` generates a bar chart, behind the scenes here is what it actually does:
+  - Generate a new `matplotlib` `Figure` object.
+  - Create a new `matplotlib` `AxesSubplot` object, and assign it to the `Figure`.
+  - Use `AxesSubplot` methods to draw the information on the screen.
+  - Return the result to the user.
+- In a similar way, our `subplots` operation above created one overall `Figure` with two `AxesSubplots` vertically nested inside of it. `subplots` returns two things, a figure (which we assigned to `fig`) and an array of the axes contained therein (which we assigned to `axarr`).
+- To tell `pandas` which subplot we want a new plot to go in \- the first one or the second one \- we need to grab the proper axis out of the list and pass it into `pandas` via the `ax` parameter.
+  ```python
+  fig, axarr = plt.subplots(2, 1, figsize=(12,8))
+  # Drawing with pandas
+  reviews.points.value_counts().sort_index().plot.bar(ax=axarr[0])
+  reviews.province.value_counts().head(20).plot.bar(ax=axarr[1])
+  
+  # Drawing with seaborn
+  sns.countplot(reviews.points, ax=axarr[0])
+  df = pd.DataFrame(reviews.groupby(["province"]).size().sort_values(ascending=False).head(20), columns=["count_province"])
+  sns.barplot(y=df.index, x=df.count_province, data=df, ax=axarr[1])
+  ```
+- Why are subplots useful?
+  - Create a large number of smaller charts probing one or a few specific aspects of the data.
+  - Make attractive and informative panel displays.
+  - **Subplots** are critically useful because they enable **faceting**, which is the act of breaking data variables up across multiple subplots, and combining those subplots into a single figure.
+
 ### Plotting with `seaborn`
 - [`seaborn` Example Gallery](https://seaborn.pydata.org/examples/index.html)
 - `seaborn` is a standalone data visualization package that provides many extremely valuable data visualizations in a single package. It is generally a much more powerful tool than pandas.
