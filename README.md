@@ -383,3 +383,8 @@
   sns.violinplot(x="variety", y="points", data=df)
   ```
 - A `violinplot` cleverly replaces the box in the boxplot with a kernel density estimate for the data. It shows basically the same data, but is harder to misinterpret and much prettier than the utilitarian boxplot.
+
+### Faceting with `seaborn`
+- **Faceting** is the act of breaking data variables up across multiple subplots, and combining those subplots into a single figure.
+- The core `seaborn` utility for faceting is the `FacetGrid`. A `FacetGrid` is an object which stores some information on how you want to break up your data visualization.
+- 
