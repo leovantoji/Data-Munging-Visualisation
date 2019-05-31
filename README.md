@@ -385,6 +385,39 @@
 - A `violinplot` cleverly replaces the box in the boxplot with a kernel density estimate for the data. It shows basically the same data, but is harder to misinterpret and much prettier than the utilitarian boxplot.
 
 ### Faceting with `seaborn`
+- **Facet Grid**: Good for data with at least 2 categorical variables.
+- **Pair Plot**: Good for exploring most kinds of data.
 - **Faceting** is the act of breaking data variables up across multiple subplots, and combining those subplots into a single figure.
 - The core `seaborn` utility for faceting is the `FacetGrid`. A `FacetGrid` is an object which stores some information on how you want to break up your data visualization.
-- 
+- For example, suppose that we're interested in (as in the previous notebook) comparing strikers and goalkeepers in some way. To do this, we can create a `FacetGrid` with our data, telling it that we want to break the `Position` variable down by `col` (column). From there, we use the `map` object method to plot the data into the laid-out grid.
+  ```python
+  df = footballers[footballers.Position.isin(["ST", "GK"])]
+  g = sns.FacetGrid(df, col="Position")
+  g.map(sns.kdeplot, "Overall")
+  ```
+- `FacetGrid` comes equipped with a `col_wrap` parameter to control the maximum number of graphs appearing in any particular row.
+  ```python
+  g = sns.FacetGrid(df, col="Position", col_wrap=6)
+  g.map(sns.kdeplot, "Overall)
+  ```
+- So far we've been dealing exclusively with one `col` (column) of data. The "grid" in `FacetGrid`, however, refers to the ability to lay data out by row *and* column. For example, suppose we're interested in comparing the talent distribution for (goalkeepers and strikers specifically, to keep things succinct) across rival clubs Real Madrid, Atlético Madrid, and FC Barcelona. As the plot below demonstrates, we can achieve this by passing `row=Position` and `col=Club` parameters into the plot.
+  ```python
+  df = footballers[footballers.Position.isin(["ST", "GK"])]
+  df = df[df.Club.isin(["Real Madrid CF", "FC Barcelona", "Atlético Madrid"])]
+  
+  g = sns.FacetGrid(df, row="Position", col="Club")
+  g.map(sns.violinplot, "Overall")
+  ```
+- `FacetGrid` orders the subplots effectively arbitrarily by default. To specify your own ordering explicitly, pass the appropriate argument to the `row_order` and `col_order` parameters.
+  ```python
+  g = sns.FacetGrid(df, row="Position", col="Club",
+                    row_order=["GK", "SG"],
+                    col_order=["Atlético Madrid", "FC Barcelona", "Real Madrid CF"])
+  g.map(sns.violinplot, "Overall")
+  ```
+- In a nutshell, faceting is the easiest way to make your data visualization multivariate. Nonetheless, faceting does have some important limitations however. It can only be used to break data out across singular or paired categorical variables with very low numeracy \- any more than five or so dimensions in the grid, and the plots become too small (or involve a lot of scrolling). Additionally it involves choosing (or letting Python) an order to plot in, but with nominal categorical variables that choice is distractingly arbitrary.
+- `pairplot` is a very useful and widely used `seaborn` method for faceting *variables* (as opposed to *variable values*). You pass it a `pandas` `DataFrame` in the right shape, and it returns you a gridded result of your variable values. By default `pairplot` will return scatter plots in the main entries and a histogram in the diagonal.
+  ```python
+  sns.pairplot(footballers[["Overall, "Potential", "Value"]])
+  ```
+- **Pair Plots** are most useful when just starting out with a dataset, because they help contextualise relationships within it.
